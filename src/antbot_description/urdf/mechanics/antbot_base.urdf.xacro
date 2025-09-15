@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+<xacro:property name="total_width" value="0.66" />
+<xacro:property name="wheel_width" value="0.08" />
+<xacro:property name="wheel_radius" value="0.0762" />
+<xacro:property name="total_height" value="1.0" />
+<xacro:property name="base_length" value="1.0" />
+<xacro:property name="base_size_x" value="${base_length}" />
+<xacro:property name="base_size_y" value="${total_width - (2 * wheel_width)}" />
+<xacro:property name="base_size_z" value="${total_height - (2 * wheel_radius)}" />
+<xacro:property name="base_mass" value="100.0" />
+
+<xacro:macro name="antbot_base" params="prefix">
+  <link name="${prefix}base_footprint"/>
+  <link name="${prefix}base_link">
+    <visual>
+        <geometry>
+            <mesh filename="file://$(find antbot_description)/meshes/body.dae"/>
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </visual>
+    <collision>
+        <geometry>
+            <mesh filename="file://$(find antbot_description)/meshes/body.dae"/>
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${base_mass}"/>
+        <inertia
+            ixx="${(1/12) * base_mass * ((base_size_y * base_size_y) + (base_size_z * base_size_z))}" ixy="0.0" ixz="0.0"
+            iyy="${(1/12) * base_mass * ((base_size_x * base_size_x) + (base_size_z * base_size_z))}" iyz="0.0"
+            izz="${(1/12) * base_mass * ((base_size_x * base_size_x) + (base_size_y * base_size_y))}"/>
+    </inertial>
+  </link>
+
+  <gazebo reference="${prefix}base_link">
+  </gazebo>
+  
+  <joint name="${prefix}base_joint" type="fixed">
+    <parent link="${prefix}base_footprint"/>
+    <child link="${prefix}base_link"/>
+    <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+  </joint>
+</xacro:macro>
+</robot>

@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <world name="house_world_no_holes">
+
+    <!-- systems -->
+    <plugin filename="gz-sim-physics-system"           name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system"     name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system"           name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- scene / light -->
+    <scene>
+      <ambient>0.55 0.55 0.58 1</ambient>
+      <background>0.82 0.85 0.90 1</background>
+      <shadows>true</shadows>
+    </scene>
+    <light name="sun" type="directional">
+      <pose>0 0 60 0 0 0</pose>
+      <diffuse>1 1 0.95 1</diffuse>
+      <specular>0.3 0.3 0.3 1</specular>
+      <direction>-0.35 0.20 -0.90</direction>
+      <cast_shadows>true</cast_shadows>
+    </light>
+
+    <!-- ========== ขนาดบ้าน ========== 
+         กรอบนอก: กว้าง 36 m (X) x ลึก 24 m (Y)
+         ผนังหนา 0.25 m, สูง 2.7 m
+         ช่องประตู “ด้านในทุกบาน” = 3.20 m (คงเดิม)
+         ================================= -->
+
+    <!-- พื้นในบ้าน (พอดีกรอบ ไม่ล้น) -->
+    <!-- ภายในจริง ≈ 36-0.25=35.75  x  24-0.25=23.75  -->
+    <model name="house_floor">
+      <static>true</static>
+      <pose>0 0 0.02 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>35.60 23.60 0.02</size></box></geometry></collision>
+        <visual name="v">
+          <geometry><box><size>35.60 23.60 0.02</size></box></geometry>
+          <material>
+            <ambient>0.28 0.28 0.30 1</ambient>
+            <diffuse>0.33 0.33 0.36 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+        </visual>
+        <!-- เส้นกริดบาง ๆ (อยู่เฉพาะบนพื้นนี้เท่านั้น) -->
+        <visual name="grid_x"><pose>0 0 0.03 0 0 0</pose>
+          <geometry><box><size>35.60 0.06 0.002</size></box></geometry>
+          <material><diffuse>0.9 0.9 0.9 0.25</diffuse></material>
+        </visual>
+        <visual name="grid_y"><pose>0 0 0.03 0 0 1.5708</pose>
+          <geometry><box><size>23.60 0.06 0.002</size></box></geometry>
+          <material><diffuse>0.9 0.9 0.9 0.25</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== ผนังรอบนอก (ทึบทั้งสี่ด้าน) ========== -->
+    <model name="outer_north"><static>true</static><pose>0 12 1.35 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>36 0.25 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>36 0.25 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="outer_south"><static>true</static><pose>0 -12 1.35 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>36 0.25 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>36 0.25 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="outer_east"><static>true</static><pose>18 0 1.35 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.25 24 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.25 24 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="outer_west"><static>true</static><pose>-18 0 1.35 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.25 24 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.25 24 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ========== ผนังด้านใน (คงช่องประตู 3.20 m) ========== -->
+    <!-- คอร์ริดอร์กลาง -->
+    <model name="v_main_top"><static>true</static><pose>0 8.80 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.25 6.40 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.25 6.40 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+    <model name="v_main_mid"><static>true</static><pose>0 0 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.25 4.80 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.25 4.80 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+    <model name="v_main_bot"><static>true</static><pose>0 -8.80 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.25 6.40 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.25 6.40 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+
+    <!-- ผนังซ้าย/ขวา และแนวนอน (เหมือนเวอร์ชันก่อน) -->
+    <model name="v_left_top"><static>true</static><pose>-8 8.80 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.25 6.40 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.25 6.40 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+    <model name="v_left_bot"><static>true</static><pose>-8 -8.80 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.25 6.40 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.25 6.40 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+
+    <model name="v_right_top"><static>true</static><pose>10 9.50 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.25 5.00 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.25 5.00 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+    <model name="v_right_mid"><static>true</static><pose>10 0 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.25 4.80 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.25 4.80 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+    <model name="v_right_bot"><static>true</static><pose>10 -9.50 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.25 5.00 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.25 5.00 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+
+    <!-- แนวนอน y=+6, 0, -6 (เว้นช่อง 3.2 m) -->
+    <model name="h_y+6_left"><static>true</static><pose>-10.60 6 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>8.80 0.25 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>8.80 0.25 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+    <model name="h_y+6_right"><static>true</static><pose>9.80 6 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>16.20 0.25 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>16.20 0.25 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+
+    <model name="h_y0_left"><static>true</static><pose>-11.40 0 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>10.40 0.25 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>10.40 0.25 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+    <model name="h_y0_right"><static>true</static><pose>12.20 0 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>11.20 0.25 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>11.20 0.25 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+
+    <model name="h_y-6_left"><static>true</static><pose>-9.80 -6 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>16.20 0.25 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>16.20 0.25 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+    <model name="h_y-6_right"><static>true</static><pose>10.60 -6 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>8.80 0.25 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>8.80 0.25 2.7</size></box></geometry>
+          <material><ambient>0.50 0.50 0.50 1</ambient><diffuse>0.60 0.60 0.60 1</diffuse></material></visual></link>
+    </model>
+
+    <!-- ผนังสั้น ๆ (ห้องน้ำ/ห้องเก็บของ ฯลฯ) -->
+    <model name="stub_a"><static>true</static><pose>-6 3 1.35 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>2.50 0.25 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.50 0.25 2.7</size></box></geometry>
+          <material><ambient>0.52 0.52 0.55 1</ambient><diffuse>0.62 0.62 0.65 1</diffuse></material></visual></link>
+    </model>
+    <model name="stub_b"><static>true</static><pose>6 -3 1.35 0 0 1.5708</pose>
+      <link name="link"><collision name="c"><geometry><box><size>2.20 0.25 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.20 0.25 2.7</size></box></geometry>
+          <material><ambient>0.52 0.52 0.55 1</ambient><diffuse>0.62 0.62 0.65 1</diffuse></material></visual></link>
+    </model>
+    <model name="stub_c"><static>true</static><pose>14 5 1.35 0 0 1.5708</pose>
+      <link name="link"><collision name="c"><geometry><box><size>2.80 0.25 2.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.80 0.25 2.7</size></box></geometry>
+          <material><ambient>0.52 0.52 0.55 1</ambient><diffuse>0.62 0.62 0.65 1</diffuse></material></visual></link>
+    </model>
+
+    <!-- กล้องมุมสูง -->
+    <gui>
+      <camera name="user_camera">
+        <pose>0 -55 24 0.90 0 0</pose>
+      </camera>
+    </gui>
+
+  </world>
+</sdf>

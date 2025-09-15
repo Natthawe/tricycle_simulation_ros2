@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="steer" params="
+    prefix:=''
+    parent:='base_link'
+    frame_id:='steering_link'
+    joint_name:='steering_joint'
+    mesh_file:='$(find antbot_description)/meshes/steer.dae'
+    joint_xyz_offset:='0.62 0 0.175'
+    joint_rpy_offset:='0 0 0'
+    joint_axis_xyz:='0 0 1'
+    mesh_xyz_offset:='0 0 0'
+    mesh_rpy_offset:='0 0 0'
+    mesh_scale:='1 1 1'
+    collision_xyz_offset:='0 0 0'
+    collision_rpy_offset:='0 0 0'
+    inertial_xyz_offset:='0 0 0'
+    inertial_rpy_offset:='0 0 0'
+    steer_width:=0.43
+    steer_height:=0.34
+    mass:=10.0
+    limit_lower:='-0.698'
+    limit_upper:='0.698'
+    limit_effort:='100'
+    limit_velocity:='2.5'
+    dynamics_damping:='0.5'
+    dynamics_friction:='0.0'
+    enable_collision:=true"
+    >
+
+    <xacro:property name="radius" value="${steer_width/2}" />
+    <xacro:property name="ixx_iyy" value="${(mass/12) * (3 * radius * radius + steer_height * steer_height)}" />
+    <xacro:property name="izz" value="${(mass/2) * (radius * radius)}" />
+
+    <link name="${prefix}${frame_id}">
+      <visual>
+        <origin xyz="${mesh_xyz_offset}" rpy="${mesh_rpy_offset}"/>
+        <geometry>
+          <mesh filename="file://${mesh_file}" scale="${mesh_scale}"/>
+        </geometry>
+      </visual>
+
+      <xacro:if value="${enable_collision}">
+        <collision>
+          <origin xyz="${collision_xyz_offset}" rpy="${collision_rpy_offset}"/>
+          <geometry>
+            <mesh filename="file://${mesh_file}" scale="${mesh_scale}"/>
+          </geometry>          
+        </collision>
+      </xacro:if>
+
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="${inertial_xyz_offset}" rpy="${inertial_rpy_offset}"/>
+        <inertia
+          ixx="${ixx_iyy}"
+          ixy="0.0"
+          ixz="0.0"
+          iyy="${ixx_iyy}"
+          iyz="0.0"
+          izz="${izz}" />
+      </inertial>
+    </link>
+
+    <joint name="${joint_name}" type="revolute">
+      <origin xyz="${joint_xyz_offset}" rpy="${joint_rpy_offset}"/>
+      <parent link="${prefix}${parent}"/>
+      <child link="${prefix}${frame_id}" />
+      <axis xyz="${joint_axis_xyz}"/>
+      <limit lower="${limit_lower}" upper="${limit_upper}" effort="${limit_effort}" velocity="${limit_velocity}"/>
+      <dynamics damping="${dynamics_damping}" friction="${dynamics_friction}"/>
+    </joint>
+
+    <!-- <gazebo reference="${prefix}${frame_id}">
+      <surface>
+        <friction>
+          <ode>
+              <mu>1.0</mu>
+              <mu2>0.0</mu2>
+          </ode>
+        </friction>
+      </surface>
+    </gazebo> -->
+
+  </xacro:macro>
+</robot>

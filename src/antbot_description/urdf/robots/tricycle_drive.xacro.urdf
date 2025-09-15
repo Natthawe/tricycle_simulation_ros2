@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<robot name="tricycle_drive" xmlns:xacro="http://ros.org/wiki/xacro" xmlns:gz="http://gazebosim.org/schema">
+
+  <xacro:arg name="robot_name" default="tricycle_drive"/>
+  <xacro:arg name="prefix" default=""/>
+  <xacro:arg name="use_gazebo" default="false"/>
+
+  <xacro:include filename="$(find antbot_description)/urdf/materials.xacro"/>
+  <xacro:include filename="$(find antbot_description)/urdf/mechanics/antbot_base.urdf.xacro"/>
+  <xacro:include filename="$(find antbot_description)/urdf/mechanics/antbot_steer.urdf.xacro"/>
+  <xacro:include filename="$(find antbot_description)/urdf/mechanics/antbot_front_wheel.urdf.xacro"/>
+  <xacro:include filename="$(find antbot_description)/urdf/mechanics/antbot_rear_wheel.urdf.xacro"/>
+  <xacro:include filename="$(find antbot_description)/urdf/mechanics/antbot_pillar.urdf.xacro"/>
+  <xacro:include filename="$(find antbot_description)/urdf/sensors/rslidar.urdf.xacro"/>
+  <xacro:include filename="$(find antbot_description)/urdf/sensors/stl27l.urdf.xacro"/>
+  <xacro:include filename="$(find antbot_description)/urdf/sensors/imu.urdf.xacro"/>
+
+  <xacro:antbot_base prefix="$(arg prefix)"/>
+
+  <xacro:steer
+    prefix="$(arg prefix)"
+    parent="base_link"
+    joint_xyz_offset="0.62 0 0.175"
+    joint_rpy_offset="0 0 0"
+    frame_id="steering_link"/>
+
+  <xacro:front_wheel
+    prefix="$(arg prefix)"
+    parent="steering_link"
+    frame_id="front_wheel_link"
+    mass="10.0"/>
+
+  <xacro:rear_wheel
+    prefix="$(arg prefix)"
+    side="rear_left"
+    x_reflect="-1"
+    y_reflect="1"
+    xyz_offset="0 0 0"
+    rpy_offset="0 0 3.14"/>
+
+  <xacro:rear_wheel
+    prefix="$(arg prefix)"
+    side="rear_right"
+    x_reflect="-1"
+    y_reflect="-1"
+    xyz_offset="0 0 0"
+    rpy_offset="0 0 0"/>    
+
+  <xacro:pillar
+    prefix="$(arg prefix)"
+    parent="base_link"
+    frame_id="pillar_link"/>
+
+  <xacro:rslidar_sensor
+    prefix="$(arg prefix)"
+    parent="pillar_link"
+    frame_id="rslidar_link"
+    xyz_offset="0.0 0.0 0.0383"
+    rpy_offset="0 0 0"
+    mesh_xyz_offset="0 0 0"
+    mesh_rpy_offset="0 0 0"
+    topic_name="scan_rslidar"/>
+
+  <xacro:stl27l_sensor
+    prefix="$(arg prefix)"
+    parent="base_link"
+    frame_id="stl27l_link"
+    xyz_offset="0.855 0.0 0.1"
+    rpy_offset="0 0 0"
+    mesh_xyz_offset="0 0 0"
+    mesh_rpy_offset="0 0 0"
+    topic_name="scan_stl27l"/>
+
+  <xacro:imu_sensor
+    prefix="$(arg prefix)"
+    parent="base_link"
+    frame_id="imu"
+    xyz_offset="0.2 0 0.7"
+    rpy_offset="0 0 0"
+    update_rate="30.0"
+    topic_name="imu"/>
+    
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+    <joint name="steering_joint">
+      <command_interface name="position" />
+      <state_interface name="position" />
+    </joint>
+    <joint name="traction_joint">
+      <command_interface name="velocity" />
+      <state_interface name="velocity" />
+      <state_interface name="position" />
+    </joint>
+
+    <joint name="rear_left_wheel_joint">
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="rear_right_wheel_joint">
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>    
+  </ros2_control>
+
+  <gazebo reference='back_left_wheel_link'>
+    <collision>
+      <surface>
+        <friction>
+          <ode>
+            <mu>1.5</mu>
+            <mu2>0.0</mu2>
+            <fdir1 gz:expressed_in="base_footprint">1 1 0</fdir1>
+          </ode>
+        </friction>
+      </surface>
+    </collision>
+  </gazebo>
+
+  <gazebo reference='back_right_wheel_link'>
+    <collision>
+      <surface>
+        <friction>
+          <ode>
+            <mu>1.5</mu>
+            <mu2>0.0</mu2>
+            <fdir1 gz:expressed_in="base_footprint">1 -1 0</fdir1>
+          </ode>
+        </friction>
+      </surface>
+    </collision>
+  </gazebo>
+
+  <gazebo reference="base_link">
+    <mu1>0.000002</mu1>
+    <mu2>0.000002</mu2>
+  </gazebo>
+
+  <gazebo>
+    <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(find antbot_ros2_control)/config/tricycle_drive_controller.yaml</parameters>
+    </plugin>
+  </gazebo>
+
+</robot>
