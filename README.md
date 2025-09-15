@@ -11,3 +11,5 @@
 
 ### Navigation:
     ros2 launch antbot_ros2_control navigation.launch.py
+
+![Navigation](/images/navigation.gif?raw=true "Navigation")    
