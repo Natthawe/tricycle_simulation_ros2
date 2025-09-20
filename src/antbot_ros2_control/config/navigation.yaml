@@ -248,7 +248,7 @@ local_costmap:
         mark_threshold: 0
         observation_sources: scan
         scan:
-          topic: /scan_rslidar
+          topic: /scan_stl27l
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -279,7 +279,7 @@ global_costmap:
         enabled: True
         observation_sources: scan
         scan:
-          topic: /scan_rslidar
+          topic: /scan_stl27l
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -440,7 +440,7 @@ collision_monitor:
     observation_sources: ["scan"]
     scan:
       type: "scan"
-      topic: "scan_rslidar"
+      topic: "scan_stl27l"
       min_height: 0.15
       max_height: 2.0
       enabled: True
